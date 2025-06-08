@@ -4,7 +4,6 @@ mod collapse;
 mod concat;
 mod dedent;
 
-
 /// `collapse!` is a compile-time macro that normalizes whitespace in a string literal.
 ///
 /// It removes all leading and trailing ASCII whitespace (`' '`, `\t`, `\n`, `\r`)
@@ -28,7 +27,6 @@ pub fn collapse(input: TokenStream) -> TokenStream {
     collapse::collapse_impl(input)
 }
 
-
 /// Concatenates adjacent string literals at compile time.
 ///
 /// It joins the string arguments together.
@@ -51,7 +49,6 @@ pub fn collapse(input: TokenStream) -> TokenStream {
 pub fn concat(input: TokenStream) -> TokenStream {
     concat::concat_impl(input)
 }
-
 
 /// Removes uniform leading indentation and optional blank lines from a multi-line string literal.
 ///

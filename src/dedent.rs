@@ -3,10 +3,10 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
+    Ident, LitInt, LitStr, Result, Token,
     parse::{Parse, ParseStream},
-    parse_macro_input, Ident, LitInt, LitStr, Token, Result,
+    parse_macro_input,
 };
-
 
 struct DedentArgs {
     string: LitStr,
@@ -49,18 +49,12 @@ impl Parse for DedentArgs {
             (string, keep_ws)
         };
 
-        Ok(DedentArgs {
-            string,
-            keep_ws,
-        })
+        Ok(DedentArgs { string, keep_ws })
     }
 }
 
 pub fn dedent_impl(input: TokenStream) -> TokenStream {
-    let DedentArgs {
-        string,
-        keep_ws,
-    } = parse_macro_input!(input as DedentArgs);
+    let DedentArgs { string, keep_ws } = parse_macro_input!(input as DedentArgs);
 
     let original = string.value();
     let mut lines: Vec<&str> = original.lines().collect();
@@ -86,7 +80,10 @@ pub fn dedent_impl(input: TokenStream) -> TokenStream {
         if i == 0 {
             match line.chars().next() {
                 Some(' ') | Some('\t') => {} // keep processing
-                _ => { first_line_needs_indent = true; continue }, // skip this line from indent analysis
+                _ => {
+                    first_line_needs_indent = true;
+                    continue;
+                } // skip this line from indent analysis
             }
         }
 
@@ -107,7 +104,9 @@ pub fn dedent_impl(input: TokenStream) -> TokenStream {
                     } else if current_style != Some(c) {
                         // Mixed indentation on a single line
                         let msg = format!("Mixed spaces and tabs on same line: {:?}", line);
-                        return syn::Error::new_spanned(&string, msg).to_compile_error().into();
+                        return syn::Error::new_spanned(&string, msg)
+                            .to_compile_error()
+                            .into();
                     }
                     indent_len += 1;
                     chars.next();
@@ -120,8 +119,13 @@ pub fn dedent_impl(input: TokenStream) -> TokenStream {
             match indent_style {
                 None => indent_style = Some(style),
                 Some(prev) if prev != style => {
-                    let msg = format!("Mixed indentation across lines: found both '{}' and '{}'", prev, style);
-                    return syn::Error::new_spanned(&string, msg).to_compile_error().into();
+                    let msg = format!(
+                        "Mixed indentation across lines: found both '{}' and '{}'",
+                        prev, style
+                    );
+                    return syn::Error::new_spanned(&string, msg)
+                        .to_compile_error()
+                        .into();
                 }
                 _ => {}
             }

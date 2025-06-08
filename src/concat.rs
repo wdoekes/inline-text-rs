@@ -2,12 +2,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{
-    parse_macro_input, Expr, ExprLit, Lit, Token,
-    punctuated::Punctuated,
-};
-
-
+use syn::{Expr, ExprLit, Lit, Token, parse_macro_input, punctuated::Punctuated};
 
 pub fn concat_impl(input: TokenStream) -> TokenStream {
     // Parse input as comma-separated expressions
@@ -17,9 +12,11 @@ pub fn concat_impl(input: TokenStream) -> TokenStream {
 
     for expr in args.iter() {
         match expr {
-            Expr::Lit(ExprLit { lit: Lit::Str(s), .. }) => {
+            Expr::Lit(ExprLit {
+                lit: Lit::Str(s), ..
+            }) => {
                 pieces.push(s.value());
-            },
+            }
             _ => {
                 return syn::Error::new_spanned(expr, "Expected a string literal")
                     .to_compile_error()
