@@ -1,0 +1,5 @@
+error: Mixed indentation across lines: found both ' ' and '    '
+ --> tests/ui/mixed_indent_across_lines.rs:5:21
+  |
+5 |     let _ = dedent!("  line\n\t\tline\n");
+  |                     ^^^^^^^^^^^^^^^^^^^^
