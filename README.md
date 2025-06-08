@@ -17,12 +17,12 @@ This is inspired by the discussions at [rust-lang RFCs PR
 ### [`collapse!`]
 
 Removes leading/trailing whitespace and collapses all internal sequences
-of whitespace ([ \t\r\n]+) into a single space.
+of whitespace (`[ \t\r\n]+`) into a single space.
 
 ```rust
 use inline_text::collapse;
 
-let s = inline_text::collapse!("
+let s = collapse!("
     SELECT t.* FROM table t
     INNER JOIN jtable j ON j.t_id = t.id
     WHERE j.status IN (
@@ -57,8 +57,8 @@ assert_eq!(s, format!("{}\n{}\n", "A".repeat(144), "B".repeat(144)));
 
 ### [`dedent!`]
 
-Removes uniform leading indentation and optional leading/trailing blank
-lines from a multiline string.
+Removes uniform leading indentation from a multiline string. Mandates
+that the leading whitespace consistently uses either spaces or tabs.
 
 ```rust
 use inline_text::dedent;
