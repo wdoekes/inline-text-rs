@@ -52,7 +52,8 @@ let s = concat!(
 assert_eq!(s, format!("{}\n{}\n", "A".repeat(144), "B".repeat(144)));
 ```
 
-*NOTE: This is different from the `std::concat!` macro. This will work as first argument to `println!()`.*
+*NOTE: This is a dumber version of the `std::concat!` macro. Only useful
+if expanded with more capabilities, like adding LFs.*
 
 
 ### [`dedent!`]
