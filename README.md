@@ -55,6 +55,9 @@ assert_eq!(s, format!("{}\n{}\n", "A".repeat(144), "B".repeat(144)));
 *NOTE: This is a dumber version of the `std::concat!` macro. Only useful
 if expanded with more capabilities, like adding LFs.*
 
+*NOTE 2: As a PoC, this `concat!()` also accepts strings without a comma separator:
+`concat!("abc" "def")`*
+
 
 ### [`dedent!`]
 

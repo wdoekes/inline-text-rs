@@ -1,33 +1,44 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use proc_macro2::{Literal, TokenTree};
 use quote::quote;
-use syn::{Expr, ExprLit, Lit, Token, parse_macro_input, punctuated::Punctuated};
+use syn::Error;
 
 pub fn concat_impl(input: TokenStream) -> TokenStream {
-    // Parse input as comma-separated expressions
-    let args = parse_macro_input!(input with Punctuated::<Expr, Token![,]>::parse_terminated);
+    let token_stream = proc_macro2::TokenStream::from(input);
+    let mut output = String::new();
 
-    let mut pieces = Vec::new();
-
-    for expr in args.iter() {
-        match expr {
-            Expr::Lit(ExprLit {
-                lit: Lit::Str(s), ..
-            }) => {
-                pieces.push(s.value());
-            }
-            _ => {
-                return syn::Error::new_spanned(expr, "Expected a string literal")
+    for token in token_stream {
+        match token {
+            TokenTree::Literal(lit) => match syn::parse_str::<syn::LitStr>(&lit.to_string()) {
+                Ok(parsed) => output.push_str(&parsed.value()),
+                Err(_) => {
+                    return Error::new_spanned(lit, "Expected a valid string literal")
+                        .to_compile_error()
+                        .into();
+                }
+            },
+            TokenTree::Punct(p) if p.as_char() == ',' => continue,
+            other => {
+                return Error::new_spanned(other, "Expected string literal")
                     .to_compile_error()
                     .into();
             }
         }
     }
 
-    let joined = pieces.concat();
-
-    TokenStream::from(quote! {
-        #joined
-    })
+    let out = Literal::string(&output);
+    quote!(#out).into()
 }
+
+/*
+fn parse_string_literal(lit: &Literal) -> String {
+    let s = lit.to_string();
+    let unquoted = s.strip_prefix('"').and_then(|s| s.strip_suffix('"'));
+    match unquoted {
+        Some(inner) => inner.replace("\\n", "\n").replace("\\t", "\t"), // handle escaped newlines/tabs
+        None => panic!("Expected a string literal"),
+    }
+}
+*/
